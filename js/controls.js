@@ -27,26 +27,6 @@ var manualRotation = quat.create(),
         controls.playPause();
       });
 
-      playL.addEventListener('click', function() {
-        controls.playPause();
-      });
-
-      playR.addEventListener('click', function() {
-        controls.playPause();
-      });
-
-      loopButton.addEventListener('click', function() {
-        controls.toggleLooping();
-      });
-
-      muteButton.addEventListener('click', function() {
-        if (video.muted === false) {
-          controls.mute();
-        } else {
-          controls.unmute();
-        }
-      });
-
       fullScreenButton.addEventListener('click', function() {
         controls.fullscreen();
       });
@@ -65,6 +45,8 @@ var manualRotation = quat.create(),
         var time = video.duration * (seekBar.value / 100);
         video.currentTime = time;
       });
+
+
 
       video.addEventListener('timeupdate', function() {
         // don't update if paused,
@@ -92,8 +74,6 @@ var manualRotation = quat.create(),
       });
 
       videoSelect.addEventListener('change', function() {
-        projection = videoSelect.value[0];
-        projectionSelect.value = projection;
 
         // Remove the hash/querystring if there were custom video parameters.
         window.history.pushState('', document.title, window.location.pathname);
@@ -106,15 +86,10 @@ var manualRotation = quat.create(),
         }
       });
 
-
-      projectionSelect.addEventListener('change', function() {
-        projection = projectionSelect.value;
-      });
-
-      document.getElementById('select-local-file').addEventListener('click', function(event) {
-        event.preventDefault();
-        controls.selectLocalVideo();
-      });
+      // document.getElementById('select-local-file').addEventListener('click', function(event) {
+      //   event.preventDefault();
+      //   controls.selectLocalVideo();
+      // });
     },
 
     enableKeyControls: function() {
@@ -166,24 +141,14 @@ var manualRotation = quat.create(),
     /**
      * Video Commands
      */
-    loaded: function() {
-      window.leftLoad.classList.add('hidden');
-      window.rightLoad.classList.add('hidden');
-      if (video.paused) {
-        window.leftPlay.classList.remove('hidden');
-        window.rightPlay.classList.remove('hidden');
-      }
-    },
 
     play: function() {
-      if (video.ended) {
-        video.currentTime = 0.1;
-      }
+      // if (video.ended) {
+      //   video.currentTime = 0.1;
+      // }
 
       video.play();
       if (!video.paused) { // In case somehow hitting play button doesn't work.
-        window.leftPlay.classList.add('hidden');
-        window.rightPlay.classList.add('hidden');
 
         window.playButton.className = 'fa fa-pause icon';
         window.playButton.title = 'Pause';
@@ -200,8 +165,8 @@ var manualRotation = quat.create(),
       window.playButton.className = 'fa fa-play icon';
       window.playButton.title = 'Play';
 
-      window.leftPlay.classList.remove('hidden');
-      window.rightPlay.classList.remove('hidden');
+      // window.leftPlay.classList.remove('hidden');
+      // window.rightPlay.classList.remove('hidden');
     },
 
     playPause: function() {
@@ -209,25 +174,6 @@ var manualRotation = quat.create(),
         controls.play();
       } else {
         controls.pause();
-      }
-    },
-
-    setLooping: function(loop) {
-      loop = !!loop;
-      if (video.loop !== loop) {
-        controls.toggleLooping();
-      }
-    },
-
-    toggleLooping: function() {
-      if (video.loop === true) {
-        loopButton.className = 'fa fa-refresh icon';
-        loopButton.title = 'Start Looping';
-        video.loop = false;
-      } else {
-        loopButton.className = 'fa fa-chain-broken icon';
-        loopButton.title = 'Stop Looping';
-        video.loop = true;
       }
     },
 
@@ -281,10 +227,6 @@ var manualRotation = quat.create(),
 
     loadVideo: function(videoFile) {
       controls.pause();
-      window.leftPlay.classList.add('hidden');
-      window.rightPlay.classList.add('hidden');
-      window.leftLoad.classList.remove('hidden');
-      window.rightLoad.classList.remove('hidden');
 
       webGL.gl.clear(webGL.gl.COLOR_BUFFER_BIT);
 
@@ -294,11 +236,11 @@ var manualRotation = quat.create(),
       }
 
       // Hack to fix rotation for vidcon video for vidcon
-      if (videoFile === 'videos/Vidcon.webm' || videoFile === 'videos/Vidcon5.mp4') {
-        manualRotation = [0.38175851106643677, -0.7102527618408203, -0.2401944249868393, 0.5404701232910156];
-      } else {
+      // if (videoFile === 'videos/Vidcon.webm' || videoFile === 'videos/Vidcon5.mp4') {
+      //   manualRotation = [0.38175851106643677, -0.7102527618408203, -0.2401944249868393, 0.5404701232910156];
+      // } else {
         manualRotation = quat.create();
-      }
+      // }
 
       var oldObjURL = videoObjectURL;
       videoObjectURL = null;
@@ -332,14 +274,16 @@ var manualRotation = quat.create(),
 
     hide: function() {
       window.videoControls.classList.add('hidden');
-      window.messageL.classList.add('hidden');
-      window.messageR.classList.add('hidden');
     },
 
     show: function() {
       window.videoControls.classList.remove('hidden');
-      window.messageL.classList.remove('hidden');
-      window.messageR.classList.remove('hidden');
+
+    },
+
+    vrMode: function() {
+      window.video.classList.remove('hidden');
+      window.glcanvas.classList.add('hidden');
     }
   };
 

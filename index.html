@@ -31,48 +31,27 @@
   <!-- Fragment shader program -->
   <script id="shader-fs" type="x-shader/x-fragment">
   varying mediump vec3 vDirection;
-  uniform mediump float eye;
-  uniform mediump float projection;
+   uniform mediump float eye;
+   uniform mediump float projection;
 
   uniform sampler2D uSampler;
 
   #define PI 3.1415926535897932384626433832795
 
   mediump vec4 directionToColor(mediump vec3 direction, mediump float eye, mediump float projection) {
-    /*
-    * Input: a direction.  +x = right, +y = up, +z = backward.
-    *        an eye. left = 0, right = 1.
-    *        a projection. see ProjectionEnum in JS file for enum
-    * Output: a color from the video
-    *
-    * Bug alert: the control flow here may screw up texture filtering.
-    */
 
-    mediump float theta = atan(direction.x, -1.0 * direction.z);
-    mediump float phi = atan(direction.y, length(direction.xz));
+    mediump float theta = atan(direction.x, -1.0 * direction.z)*3.0 + 1.0*PI;
+    mediump float phi = atan(direction.y, length(direction.xz))*3.0;
 
-    /*
-    * The Nexus 7 and the Moto X (and possibly many others) have
-    * a buggy atan2 implementation that screws up when the numerator
-    * (the first argument) is too close to zero.  (The 1e-4 is carefully
-    * chosen: 1e-5 doesn't fix the problem.
-    */
-    if (abs(direction.x) < 1e-4 * abs(direction.z))
-    theta = 0.5*PI * (1.0 - sign(-1.0 * direction.z));
-    if (abs(direction.y) < 1e-4 * length(direction.xz))
-    phi = 0.0;
+    highp float x = 1.0 - (theta / (2.0*PI));
+    highp float y = phi / PI + 0.5;
 
-    // Uncomment to debug the transformations.
-    // return vec4(theta / (2. * PI) + 0.5, phi / (2. * PI) + 0.5, 0., 0.);
+    if (y < 0.0 || y > 1.0)
+      return vec4(0.0, 0.0, 0.0, 0.0);
+    if (x < 0.0 || x > 1.0)
+      return vec4(0.0, 0.0, 0.0, 0.0);
 
-    if (projection == 0.) {
-      // Projection == 0: equirectangular projection
-      return texture2D(uSampler, vec2(mod(theta / (2.0*PI), 1.0), phi / PI + 0.5));
-    } else {
-      // Projection == 1: equirectangular top/bottom 3D projection
-      eye = 1. - eye;
-      return texture2D(uSampler, vec2(mod(theta / (2.0*PI), 1.0), ((phi / PI + 0.5) + eye)/ 2.));
-    }
+    return texture2D(uSampler, vec2(x, y));
   }
 
   void main(void) {
@@ -127,9 +106,9 @@
     <canvas id="glcanvas">
       Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
     </canvas>
-    <video class="hidden" preload="auto" id="video" loop="true" webkit-playsinline crossOrigin="anonymous">
-      <source src="video/therelaxatron2.mp4" type="video/mp4">
-      <source src="video/therelaxatron.webm" type="video/webm">
+    <video class="hidden" preload="auto" id="video" loop="false" webkit-playsinline crossOrigin="anonymous">
+      <source src="video/Showreel.mp4" type="video/mp4">
+      <!-- <source src="video/therelaxatron.webm" type="video/webm"> -->
     </video>
         <!-- Video Controls -->
         <div id="video-controls" class="hidden">
@@ -146,16 +125,14 @@
 
           <a id="select-local-file" class="fa fa-folder-open icon rfloat" title="Select File"></a>
 
-          <select id="projection-select" class="rfloat">
+          <!-- <select id="projection-select" class="rfloat">
             <option value=0>Equirectangular</option>
             <option value=1>Equirectangular 3D</option>
-          </select>
+          </select> -->
 
           <select id="video-select" class="rfloat">
-            <option value="0video/therelaxatron2.mp4">The Relaxatron (mp4)</option>
-            <option value="0video/therelaxatron.webm">The Relaxatron (webm)</option>
-            <option value="1video/Vidcon5.mp4">Vidcon (mp4)</option>
-            <option value="1video/Vidcon.webm">Vidcon (webm)</option>
+            <option value="video/Showreel.mp4">Showrell (MP4)</option>
+
           </select>
 
           <a id="full-screen" class="fa fa-expand icon rfloat" title="Full Screen"></a>

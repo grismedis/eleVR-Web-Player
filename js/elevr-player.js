@@ -16,7 +16,7 @@
 
 var currentScreenOrientation = window.orientation || 0; // active default
 
-var timing = {showTiming: false, // Switch to true to show frame times in the console
+var timing = {showTiming: true, // Switch to true to show frame times in the console
               frameTime: 0,
               prevFrameTime: 0,
               canvasResized: 0,
@@ -47,39 +47,23 @@ function setupControls() {
   }
 
   window.videoControls = document.getElementById('video-controls');
-  window.messageL = document.getElementById('message-l');
-  window.messageR = document.getElementById('message-r');
 
   resizeContainer();
-
-  window.leftLoad = document.getElementById('left-load');
-  window.rightLoad = document.getElementById('right-load');
-  window.leftPlay = document.getElementById('left-play');
-  window.rightPlay = document.getElementById('right-play');
   window.canvas = document.getElementById('glcanvas');
   window.video = document.getElementById('video');
 
   // Buttons
   window.playButton = document.getElementById('play-pause');
-  window.playL = document.getElementById('play-l');
-  window.playR = document.getElementById('play-r');
   window.muteButton = document.getElementById('mute');
-  window.loopButton = document.getElementById('loop');
   window.recenterButton = document.getElementById('recenter');
   window.fullScreenButton = document.getElementById('full-screen');
+  window.vrButton = document.getElementById('cardboard');
 
   // Sliders
   window.seekBar = document.getElementById('seek-bar');
 
   // Selectors
   window.videoSelect = document.getElementById('video-select');
-  window.projectionSelect = document.getElementById('projection-select');
-
-  document.getElementById('title-l').style.fontSize = window.outerHeight / 20 + 'px';
-  document.getElementById('title-r').style.fontSize = window.outerHeight / 20 + 'px';
-
-  window.messageL.style.fontSize = window.outerHeight / 30 + 'px';
-  window.messageR.style.fontSize = window.outerHeight / 30 + 'px';
 
   controls.create();
 
@@ -117,7 +101,7 @@ function runEleVRPlayer() {
     webGL.initBuffers();
     webGL.initTextures();
 
-    window.video.addEventListener('canplaythrough', controls.loaded);
+    // window.video.addEventListener('canplaythrough', controls.loaded);
     window.video.addEventListener('ended', controls.ended);
 
     // Keep a record of all the videos that are in the drop-down menu.
@@ -138,9 +122,9 @@ function initFromSettings(newSettings) {
   }
 
   var settings = util.getTruthyURLSearchParams(newSettings, {
-    autoplay: undefined,
+    autoplay: false,
     controls: true,
-    loop: true,
+    loop: false,
     sound: true,
     projection: 'mono'
   });
@@ -150,10 +134,10 @@ function initFromSettings(newSettings) {
   } else {
     controls.hide();
 
-    if (typeof settings.autoplay === 'undefined') {
-      // `autoplay` by default if controls are hidden and no explicit `autoplay` param set.
-      settings.autoplay = true;
-    }
+    // if (typeof settings.autoplay === 'undefined') {
+    //   // `autoplay` by default if controls are hidden and no explicit `autoplay` param set.
+    //   settings.autoplay = true;
+    // }
   }
 
   if (settings.sound) {
@@ -162,23 +146,24 @@ function initFromSettings(newSettings) {
     controls.mute();
   }
 
-  settings.projection = util.getCustomProjection(settings.projection);
+  //  settings.projection = util.getCustomProjection(settings.projection);
+   //
+  //  if (projection !== settings.projection) {
+  //    projection = settings.projection;
+   //
+  //    if (window.projectionSelect) {
+  //      window.projectionSelect.value = settings.projection;
+  //    }
+  //  }
 
-  if (projection !== settings.projection) {
-    projection = settings.projection;
-
-    if (window.projectionSelect) {
-      window.projectionSelect.value = settings.projection;
-    }
-  }
-
-  controls.setLooping(settings.loop);
+  // controls.setLooping(settings.loop);
 
   if (settings.video) {
     window.video.innerHTML = '';
 
     if (window.videoSelect) {
-      var optionValue = settings.projection + settings.video;
+      // var optionValue = settings.projection + settings.video;
+      var optionValue = settings.video;
 
       if (optionValue in videoOptions) {
         videoOptions[optionValue].selected = true;
@@ -190,11 +175,11 @@ function initFromSettings(newSettings) {
         // Note: The controls code expects the filename to be prefixed with '0' or '1'.
         option.value = optionValue;
 
-        if (settings.autoplay) {
-          option.dataset.autoplay = '';
-        } else {
-          delete option.dataset.autoplay;
-        }
+        // if (settings.autoplay) {
+        //   option.dataset.autoplay = '';
+        // } else {
+        //   delete option.dataset.autoplay;
+        // }
 
         videoOptions[optionValue] = option;
 
@@ -205,12 +190,12 @@ function initFromSettings(newSettings) {
     controls.loadVideo(settings.video);
   }
 
-  if (settings.autoplay) {
-    controls.play();
-  } else if (settings.autoplay === false) {
-    // If user did not explicitly set `autoplay`, don't pause unnecessarily.
-    window.video.pause();
-  }
+  // if (settings.autoplay) {
+  //   controls.play();
+  // } else if (settings.autoplay === false) {
+  //   // If user did not explicitly set `autoplay`, don't pause unnecessarily.
+  //   window.video.pause();
+  // }
 }
 
 window.addEventListener('hashchange', function() {
